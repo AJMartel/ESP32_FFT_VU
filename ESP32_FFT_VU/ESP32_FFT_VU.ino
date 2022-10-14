@@ -29,9 +29,9 @@ const uint8_t kMatrixHeight = 16;                         // Matrix height
 
 // Sampling and FFT stuff
 unsigned int sampling_period_us;
-byte peak[] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};              // The length of these arrays must be >= NUM_BANDS
-int oldBarHeights[] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
-int bandValues[] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+byte peak[NUM_BANDS];              // The length of these arrays must be >= NUM_BANDS
+int oldBarHeights[NUM_BANDS];      // As these are global, they will be set with zeros before initialization
+int bandValues[NUM_BANDS];         // Therefore you are not required to manually adjust these arrays when the NUM_BANDS changes
 double vReal[SAMPLES];
 double vImag[SAMPLES];
 unsigned long newTime;
@@ -141,8 +141,8 @@ void loop() {
   // Analyse FFT results
   for (int i = 2; i < (SAMPLES/2); i++){       // Don't use sample 0 and only first SAMPLES/2 are usable. Each array element represents a frequency bin and its value the amplitude.
     if (vReal[i] > NOISE) {                    // Add a crude noise filter
-
-    /*8 bands, 12kHz top band
+#if (NUM_BANDS == 8)
+    //8 bands, 12kHz top band
       if (i<=3 )           bandValues[0]  += (int)vReal[i];
       if (i>3   && i<=6  ) bandValues[1]  += (int)vReal[i];
       if (i>6   && i<=13 ) bandValues[2]  += (int)vReal[i];
@@ -150,8 +150,8 @@ void loop() {
       if (i>27  && i<=55 ) bandValues[4]  += (int)vReal[i];
       if (i>55  && i<=112) bandValues[5]  += (int)vReal[i];
       if (i>112 && i<=229) bandValues[6]  += (int)vReal[i];
-      if (i>229          ) bandValues[7]  += (int)vReal[i];*/
-
+      if (i>229          ) bandValues[7]  += (int)vReal[i];
+#elif (NUM_BANDS == 16)
     //16 bands, 12kHz top band
       if (i<=2 )           bandValues[0]  += (int)vReal[i];
       if (i>2   && i<=3  ) bandValues[1]  += (int)vReal[i];
@@ -169,6 +169,43 @@ void loop() {
       if (i>135 && i<=189) bandValues[13] += (int)vReal[i];
       if (i>189 && i<=264) bandValues[14] += (int)vReal[i];
       if (i>264          ) bandValues[15] += (int)vReal[i];
+#elif (NUM_BANDS == 32)
+    //32 bands, 12kHz top band
+      if (i<=2 )           bandValues[0]  += (int)vReal[i];
+      if (i>2   && i<=3  ) bandValues[1]  += (int)vReal[i];
+      if (i>3   && i<=3  ) bandValues[2]  += (int)vReal[i];
+      if (i>3   && i<=4  ) bandValues[3]  += (int)vReal[i];
+      if (i>4   && i<=4  ) bandValues[4]  += (int)vReal[i];
+      if (i>4   && i<=5  ) bandValues[5]  += (int)vReal[i];
+      if (i>5   && i<=6  ) bandValues[6]  += (int)vReal[i];
+      if (i>6   && i<=7  ) bandValues[7]  += (int)vReal[i];
+      if (i>7   && i<=8  ) bandValues[8]  += (int)vReal[i];
+      if (i>8   && i<=10  ) bandValues[9]  += (int)vReal[i];
+      if (i>10   && i<=11  ) bandValues[10]  += (int)vReal[i];
+      if (i>11   && i<=13  ) bandValues[11]  += (int)vReal[i];
+      if (i>13   && i<=15  ) bandValues[12]  += (int)vReal[i];
+      if (i>15   && i<=18  ) bandValues[13]  += (int)vReal[i];
+      if (i>18   && i<=21  ) bandValues[14]  += (int)vReal[i];
+      if (i>21   && i<=25  ) bandValues[15]  += (int)vReal[i];
+      if (i>25   && i<=30  ) bandValues[16]  += (int)vReal[i];
+      if (i>30   && i<=35  ) bandValues[17]  += (int)vReal[i];
+      if (i>35   && i<=41  ) bandValues[18]  += (int)vReal[i];
+      if (i>41   && i<=48  ) bandValues[19]  += (int)vReal[i];
+      if (i>48   && i<=56  ) bandValues[20]  += (int)vReal[i];
+      if (i>56   && i<=66  ) bandValues[21]  += (int)vReal[i];
+      if (i>66   && i<=78  ) bandValues[22]  += (int)vReal[i];
+      if (i>78   && i<=92  ) bandValues[23]  += (int)vReal[i];
+      if (i>92   && i<=108  ) bandValues[24]  += (int)vReal[i];
+      if (i>108   && i<=127  ) bandValues[25]  += (int)vReal[i];
+      if (i>127   && i<=149  ) bandValues[26]  += (int)vReal[i];
+      if (i>149   && i<=175  ) bandValues[27]  += (int)vReal[i];
+      if (i>175   && i<=206  ) bandValues[28]  += (int)vReal[i];
+      if (i>206   && i<=242  ) bandValues[29]  += (int)vReal[i];
+      if (i>242   && i<=284  ) bandValues[30]  += (int)vReal[i];
+      if (i>284             ) bandValues[31]  += (int)vReal[i];
+#else
+  #error "NUM_BANDS is using undefined value."
+#endif      
     }
   }
 
